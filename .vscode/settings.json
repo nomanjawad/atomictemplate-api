@@ -1,0 +1,75 @@
+{
+  "cSpell.diagnosticLevel": "Hint",
+  "cSpell.words": [
+    "Aljouf",
+    "Alsad",
+    "Alsulaiteenv",
+    "Alyahya",
+    "amco",
+    "Anamul",
+    "Arbaid",
+    "ATCE",
+    "Baytur",
+    "Bmet",
+    "Brookfield",
+    "Consolas",
+    "Daam",
+    "embla",
+    "Emdad",
+    "Esad",
+    "Ewan",
+    "Fahad",
+    "Gazi",
+    "Geolocation",
+    "GSAP",
+    "Hanif",
+    "Hoque",
+    "Ibne",
+    "ipapi",
+    "Ivta",
+    "Jabbar",
+    "Jawahr",
+    "JetBrains",
+    "Jidah",
+    "Jouf",
+    "Limark",
+    "Meadown",
+    "Medgulf",
+    "METSCCO",
+    "morphism",
+    "Mutairi",
+    "Noman",
+    "Nsda",
+    "oninverse",
+    "partialize",
+    "petroserv",
+    "Petrosev",
+    "Sayed",
+    "Senyar",
+    "Skytech",
+    "TRAGS",
+    "vercel",
+    "Zaman"
+  ],
+  "prettier.semi": false,
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "fileHeaderComment.parameter": {
+    "*": {
+      "company": "Noman Jawad",
+      "note": "All rights reserved",
+    }
+  },
+  "fileHeaderComment.template": {
+    "*": [
+      "${commentbegin}",
+      "${commentprefix} ${filename}",
+      "${commentprefix} Created by ${author}",
+      // "${commentprefix} Created on ${date}",
+      "${commentprefix} Copyright (c) ${year} ${company}",
+      "${commentprefix} ${note}",
+      "${commentend}"
+    ]
+  }
+}
