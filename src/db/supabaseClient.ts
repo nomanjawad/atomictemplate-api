@@ -1,8 +1,17 @@
+/**
+ * @module db/supabaseClient
+ * @description Supabase client initialization and configuration
+ */
+
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
+/** @constant {string} Supabase project URL from environment */
 const SUPABASE_URL = process.env.SUPABASE_URL || ''
 
-// Use anon key (JWT format) - this is the correct key for Supabase client
+/**
+ * @constant {string} Supabase anonymous key
+ * Supports both SUPABASE_ANON_KEY and NEXT_PUBLIC_SUPABASE_ANON_KEY for flexibility
+ */
 const SUPABASE_KEY =
   process.env.SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
@@ -21,8 +30,11 @@ if (!SUPABASE_KEY) {
   console.error('No Supabase key found in environment variables')
 }
 
-// Create a single Supabase client using the key (publishable or anon)
-// This client will use Supabase Auth for authentication and RLS for security
+/**
+ * Supabase client instance
+ * Configured with auto token refresh, no session persistence (backend)
+ * @type {SupabaseClient | null}
+ */
 export const supabase: SupabaseClient | null =
   SUPABASE_URL && SUPABASE_KEY
     ? createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -39,5 +51,8 @@ if (!supabase) {
   console.error('Supabase client failed to initialize')
 }
 
-// Export as supabaseClient for backwards compatibility
+/**
+ * Alias for supabase client (backwards compatibility)
+ * @type {SupabaseClient | null}
+ */
 export const supabaseClient = supabase
