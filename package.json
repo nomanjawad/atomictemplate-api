@@ -14,7 +14,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@atomictemplate/validations": "^1.0.3",
+    "@atomictemplate/validations": "^1.1.0",
     "@supabase/supabase-js": "^2.86.2",
     "cors": "^2.8.5",
     "express": "^5.2.1",

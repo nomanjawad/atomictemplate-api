@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@atomictemplate/validations':
-        specifier: ^1.0.3
-        version: 1.0.3(zod@4.1.13)
+        specifier: ^1.1.0
+        version: 1.1.0(zod@4.1.13)
       '@supabase/supabase-js':
         specifier: ^2.86.2
         version: 2.86.2
@@ -81,8 +81,8 @@ importers:
 
 packages:
 
-  '@atomictemplate/validations@1.0.3':
-    resolution: {integrity: sha512-O7KE0YLh7stZnPhvBBMQbJx2o9hBo9bBLrEdVGSCy1LMybKIzzj+1rBjbE2XGZa4KXRPVLTwXWJhLY9zeEk5aA==}
+  '@atomictemplate/validations@1.1.0':
+    resolution: {integrity: sha512-oWqTY67C+OUIrzrH92PIHap2M+iqcoodOJUEOuAOKkfoXjCqS7341YWJzvjwOYR3VmjDbtWse6/uqzSzCEf+OQ==}
     peerDependencies:
       zod: '>=3.20.0 || >=4.0.0'
 
@@ -2466,7 +2466,7 @@ packages:
 
 snapshots:
 
-  '@atomictemplate/validations@1.0.3(zod@4.1.13)':
+  '@atomictemplate/validations@1.1.0(zod@4.1.13)':
     dependencies:
       zod: 4.1.13
 
