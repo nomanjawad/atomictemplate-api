@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { supabaseClient } from '../db/supabaseClient.js'
+import { supabaseClient } from '@db'
 import { BlogPostSchema } from '@atomictemplate/validations'
 
 export async function list(_req: Request, res: Response) {

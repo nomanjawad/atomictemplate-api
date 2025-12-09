@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import * as blogController from '../../controllers/blog.controller.js'
+import { list as listBlogs, get as getBlog } from '@controllers'
 
 const router = Router()
 
-router.get('/', blogController.list)
-router.get('/:slug', blogController.get)
+router.get('/', listBlogs)
+router.get('/:slug', getBlog)
 
 export default router

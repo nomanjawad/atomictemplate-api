@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { supabase } from '../db/supabaseClient.js'
+import { supabase } from '@db'
 
 /**
  * Register a new user using Supabase Auth

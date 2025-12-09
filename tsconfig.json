@@ -7,6 +7,30 @@
         ],
         "outDir": "dist",
         "rootDir": "src",
+        "baseUrl": ".",
+        "paths": {
+            "@controllers": [
+                "src/controllers/index.ts"
+            ],
+            "@controllers/*": [
+                "src/controllers/*"
+            ],
+            "@db": [
+                "src/db/index.ts"
+            ],
+            "@db/*": [
+                "src/db/*"
+            ],
+            "@middleware": [
+                "src/middleware/index.ts"
+            ],
+            "@middleware/*": [
+                "src/middleware/*"
+            ],
+            "@routes/*": [
+                "src/routes/*"
+            ]
+        },
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
