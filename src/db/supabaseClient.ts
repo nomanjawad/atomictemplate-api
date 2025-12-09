@@ -1,28 +1,40 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.SUPABASE_URL || ''
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-const SUPABASE_PUBLISHABLE_KEY =
-  process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || ''
 
-export const HAS_SUPABASE_SERVICE_ROLE_KEY = Boolean(SUPABASE_SERVICE_ROLE_KEY)
+// Try new publishable key first, then fall back to anon key
+const SUPABASE_KEY =
+  process.env.SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  ''
 
 if (!SUPABASE_URL) {
-  console.warn('SUPABASE_URL is not set — Supabase clients will not be available')
+  console.error('SUPABASE_URL is not set')
 }
 
-// Production should require a service role key for admin operations
-if (process.env.NODE_ENV === 'production' && !HAS_SUPABASE_SERVICE_ROLE_KEY) {
-  console.error('SUPABASE_SERVICE_ROLE_KEY is required in production — aborting')
-  process.exit(1)
+if (!SUPABASE_KEY) {
+  console.error('No Supabase key found in environment variables')
 }
 
-export const supabaseAdmin: SupabaseClient | null = SUPABASE_URL && HAS_SUPABASE_SERVICE_ROLE_KEY ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY) : null
-export const supabaseClient: SupabaseClient | null = SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY) : null
+// Create a single Supabase client using the key (publishable or anon)
+// This client will use Supabase Auth for authentication and RLS for security
+export const supabase: SupabaseClient | null =
+  SUPABASE_URL && SUPABASE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_KEY, {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: false, // Backend doesn't need to persist sessions
+          detectSessionInUrl: false
+        }
+      })
+    : null
 
-// For convenience, export a default `supabase` variable (prefer admin when available)
-export const supabase: SupabaseClient | null = supabaseAdmin ?? supabaseClient
-
-if (process.env.SUPABASE_ANON_KEY && !process.env.SUPABASE_PUBLISHABLE_KEY && !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
-  console.warn('Using legacy SUPABASE_ANON_KEY — consider switching to SUPABASE_PUBLISHABLE_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY')
+// Log initialization status only on failure
+if (!supabase) {
+  console.error('Supabase client failed to initialize')
 }
+
+// Export as supabaseClient for backwards compatibility
+export const supabaseClient = supabase

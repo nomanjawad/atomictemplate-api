@@ -1,60 +1,84 @@
-import { supabaseAdmin, supabaseClient, HAS_SUPABASE_SERVICE_ROLE_KEY } from '../db/supabaseClient.js';
+import { supabase } from '../db/supabaseClient.js';
+/**
+ * Register a new user using Supabase Auth
+ * Uses signUp which allows public registration
+ */
 export async function register(req, res) {
-    const { email, password } = req.body;
-    if (!email || !password)
+    const { email, password, full_name } = req.body;
+    if (!email || !password) {
         return res.status(400).json({ error: 'email and password required' });
-    // Only allow registration (admin create) if service role key is present
-    if (!HAS_SUPABASE_SERVICE_ROLE_KEY || !supabaseAdmin) {
-        return res.status(503).json({ error: 'Admin user creation is disabled on this server (missing admin key)' });
+    }
+    if (!supabase) {
+        return res.status(500).json({ error: 'Supabase client not configured' });
     }
     try {
-        const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        // Sign up a new user with Supabase Auth
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            email_confirm: true,
+            options: {
+                data: {
+                    full_name: full_name || null
+                }
+            }
         });
-        if (error)
+        if (error) {
             return res.status(400).json({ error: error.message });
-        return res.json({ user: data });
+        }
+        return res.status(201).json({
+            message: 'User registered successfully',
+            user: data.user,
+            session: data.session
+        });
     }
     catch (err) {
-        console.error(err);
+        console.error('Registration error:', err);
         return res.status(500).json({ error: 'Unknown server error' });
     }
 }
+/**
+ * Login user with email and password
+ */
 export async function login(req, res) {
     const { email, password } = req.body;
-    if (!email || !password)
+    if (!email || !password) {
         return res.status(400).json({ error: 'email and password required' });
+    }
+    if (!supabase) {
+        return res.status(500).json({ error: 'Supabase client not configured' });
+    }
     try {
-        // Use the client (anon) key to sign in users
-        if (!supabaseClient)
-            return res.status(500).json({ error: 'Supabase client not configured' });
-        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-        if (error)
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
             return res.status(401).json({ error: error.message });
-        return res.json({ data });
+        }
+        return res.json({
+            message: 'Login successful',
+            user: data.user,
+            session: data.session
+        });
     }
     catch (err) {
-        console.error(err);
+        console.error('Login error:', err);
         return res.status(500).json({ error: 'Unknown server error' });
     }
 }
-export async function logout(req, res) {
+/**
+ * Logout user (sign out from Supabase Auth)
+ */
+export async function logout(_req, res) {
+    if (!supabase) {
+        return res.status(500).json({ error: 'Supabase client not configured' });
+    }
     try {
-        const header = req.headers.authorization;
-        if (!header?.startsWith('Bearer '))
-            return res.status(400).json({ error: 'invalid token' });
-        const token = header.split(' ')[1];
-        if (!supabaseClient)
-            return res.status(500).json({ error: 'Supabase client not configured' });
-        const { error } = await supabaseClient.auth.signOut();
-        if (error)
+        const { error } = await supabase.auth.signOut();
+        if (error) {
             return res.status(400).json({ error: error.message });
-        return res.json({ ok: true });
+        }
+        return res.json({ message: 'Logout successful' });
     }
     catch (err) {
-        console.error(err);
+        console.error('Logout error:', err);
         return res.status(500).json({ error: 'Unknown server error' });
     }
 }

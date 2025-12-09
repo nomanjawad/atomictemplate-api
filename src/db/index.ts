@@ -1,66 +1,106 @@
-import { Client } from 'pg'
-import { supabaseAdmin, supabaseClient, HAS_SUPABASE_SERVICE_ROLE_KEY } from './supabaseClient.js'
-import config from './config.js'
+import { supabase } from './supabaseClient.js'
 
-export async function checkPostgres() {
-  if (!config.pgConnectionString || config.pgConnectionString.includes('://@:')) {
-    return { ok: false, reason: 'PG connection string not configured' }
+/**
+ * Check Supabase REST API connection
+ */
+export async function checkSupabaseAPI() {
+  if (!supabase) {
+    return { ok: false, reason: 'Supabase client not initialized (missing URL or publishable key)' }
   }
 
-  const client = new Client({ connectionString: config.pgConnectionString })
   try {
-    await client.connect()
-    await client.query('SELECT 1')
-    await client.end()
+    // Simple health check - query users table
+    const { error } = await supabase.from('users').select('id').limit(1)
+
+    if (error) {
+      // If we get a permissions or table not found error, the API is still working
+      if (error.code === 'PGRST301' || error.message.includes('permission denied') || error.code === '42P01') {
+        return { ok: true, note: 'API reachable' }
+      }
+      return { ok: false, reason: error.message }
+    }
+
     return { ok: true }
   } catch (err: any) {
-    try {
-      await client.end()
-    } catch {}
     return { ok: false, reason: err?.message || String(err) }
   }
 }
 
-export async function checkSupabaseClient() {
-  if (!supabaseClient) return { ok: false, reason: 'Supabase ANON client missing' }
+/**
+ * Check Supabase Auth service
+ */
+export async function checkSupabaseAuth() {
+  if (!supabase) {
+    return { ok: false, reason: 'Supabase client not initialized' }
+  }
+
   try {
-    // Try to ping using a small, safe request. We choose a read from a table (may not exist).
-    // This will fail if table doesn't exist but still indicates the API is reachable.
-    const { error } = await supabaseClient.from('blog_posts').select('id').limit(1)
+    // Check if auth service is reachable by getting the session (will be null, but service responds)
+    const { data, error } = await supabase.auth.getSession()
+
     if (error) {
       return { ok: false, reason: error.message }
     }
-    return { ok: true }
+
+    return { ok: true, sessionActive: !!data.session }
   } catch (err: any) {
     return { ok: false, reason: err?.message || String(err) }
   }
 }
 
-export async function checkSupabaseAdmin() {
-  if (!supabaseAdmin) return { ok: false, reason: 'Supabase SERVICE ROLE key missing' }
+/**
+ * Check Supabase Storage service
+ */
+export async function checkSupabaseStorage() {
+  if (!supabase) {
+    return { ok: false, reason: 'Supabase client not initialized' }
+  }
+
   try {
-    // List users (limited) as a safe, admin-side check.
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1 }) as any
-    if (error) return { ok: false, reason: error.message }
-    return { ok: true }
+    // List buckets (this will work with publishable key)
+    const { data, error } = await supabase.storage.listBuckets()
+
+    if (error) {
+      return { ok: false, reason: error.message }
+    }
+
+    return { ok: true, bucketsCount: data?.length || 0 }
   } catch (err: any) {
     return { ok: false, reason: err?.message || String(err) }
   }
 }
 
+/**
+ * Check all Supabase services
+ */
 export async function checkAllConnections() {
-  const [pg, saClient, saAdmin] = await Promise.all([checkPostgres(), checkSupabaseClient(), checkSupabaseAdmin()])
+  const [supabaseAPI, supabaseAuth, supabaseStorage] = await Promise.all([
+    checkSupabaseAPI(),
+    checkSupabaseAuth(),
+    checkSupabaseStorage()
+  ])
+
+  const allHealthy = supabaseAPI.ok && supabaseAuth.ok && supabaseStorage.ok
+
   return {
-    postgres: pg,
-    supabaseClient: saClient,
-    supabaseAdmin: saAdmin,
-    adminKeyPresent: HAS_SUPABASE_SERVICE_ROLE_KEY,
+    healthy: allHealthy,
+    timestamp: new Date().toISOString(),
+    services: {
+      supabaseAPI,
+      supabaseAuth,
+      supabaseStorage
+    },
+    environment: {
+      nodeEnv: process.env.NODE_ENV || 'development',
+      supabaseUrl: process.env.SUPABASE_URL ? '✓ configured' : '✗ missing',
+      publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY ? '✓ configured' : '✗ missing'
+    }
   }
 }
 
 export default {
   checkAllConnections,
-  checkPostgres,
-  checkSupabaseClient,
-  checkSupabaseAdmin,
+  checkSupabaseAPI,
+  checkSupabaseAuth,
+  checkSupabaseStorage
 }

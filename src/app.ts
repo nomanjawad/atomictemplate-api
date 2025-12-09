@@ -2,17 +2,36 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 import apiRouter from './routes/index.js'
 import { checkAllConnections } from './db/index.js'
 import { errorHandler } from './middleware/error.js'
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 const app = express()
 
-app.use(helmet())
+// Configure helmet to allow inline scripts for Tailwind CDN
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
+      },
+    },
+  })
+)
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')))
 
 app.use(
   rateLimit({

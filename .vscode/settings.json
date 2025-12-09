@@ -1,4 +1,7 @@
 {
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
   "cSpell.diagnosticLevel": "Hint",
   "cSpell.words": [
     "Aljouf",
@@ -51,14 +54,29 @@
     "vercel",
     "Zaman"
   ],
-  "prettier.semi": false,
-  "files.associations": {
-    "*.css": "tailwindcss"
-  },
+  "deno.enablePaths": [
+    "supabase/functions"
+  ],
+  "deno.lint": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm",
+    "sloppy-imports",
+    "unsafe-proto",
+    "webgpu",
+    "broadcast-channel",
+    "worker-options",
+    "cron",
+    "kv",
+    "ffi",
+    "fs",
+    "http",
+    "net"
+  ],
   "fileHeaderComment.parameter": {
     "*": {
       "company": "Noman Jawad",
-      "note": "All rights reserved",
+      "note": "All rights reserved"
     }
   },
   "fileHeaderComment.template": {
@@ -66,10 +84,13 @@
       "${commentbegin}",
       "${commentprefix} ${filename}",
       "${commentprefix} Created by ${author}",
-      // "${commentprefix} Created on ${date}",
       "${commentprefix} Copyright (c) ${year} ${company}",
       "${commentprefix} ${note}",
       "${commentend}"
     ]
-  }
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "prettier.semi": false
 }
