@@ -2,13 +2,16 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.SUPABASE_URL || ''
 
-// Try new publishable key first, then fall back to anon key
+// Use anon key (JWT format) - this is the correct key for Supabase client
 const SUPABASE_KEY =
-  process.env.SUPABASE_PUBLISHABLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   ''
+
+// Debug logging
+console.log('DEBUG - SUPABASE_URL:', SUPABASE_URL ? 'present' : 'MISSING')
+console.log('DEBUG - SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'present' : 'MISSING')
+console.log('DEBUG - SUPABASE_KEY:', SUPABASE_KEY ? 'present' : 'MISSING')
 
 if (!SUPABASE_URL) {
   console.error('SUPABASE_URL is not set')
