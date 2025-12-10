@@ -7,6 +7,7 @@
         ],
         "outDir": "dist",
         "rootDir": "src",
+        "ignoreDeprecations": "6.0",
         "baseUrl": ".",
         "paths": {
             "@controllers": [
@@ -27,8 +28,20 @@
             "@middleware/*": [
                 "src/middleware/*"
             ],
+            "@repositories": [
+                "src/repositories/index.ts"
+            ],
+            "@repositories/*": [
+                "src/repositories/*"
+            ],
             "@routes/*": [
                 "src/routes/*"
+            ],
+            "@types/*": [
+                "src/types/*"
+            ],
+            "@utils/*": [
+                "src/utils/*"
             ]
         },
         "esModuleInterop": true,
