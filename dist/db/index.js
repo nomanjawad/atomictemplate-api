@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient.js';
+export { supabase, supabaseClient } from './supabaseClient.js';
 /**
  * Check Supabase REST API connection
  */

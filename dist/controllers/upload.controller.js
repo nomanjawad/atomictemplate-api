@@ -1,0 +1,233 @@
+import { supabase } from '@db';
+import multer from 'multer';
+import path from 'path';
+// Configure multer for memory storage (files will be uploaded directly to Supabase)
+const storage = multer.memoryStorage();
+// File filter - only allow images
+const fileFilter = (req, file, callback) => {
+    const allowedMimeTypes = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/svg+xml'
+    ];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+        callback(null, true);
+    }
+    else {
+        callback(new Error('Invalid file type. Only images are allowed.'));
+    }
+};
+// Multer instance
+export const upload = multer({
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 10 * 1024 * 1024 // 10MB max file size
+    }
+});
+/**
+ * Upload single image to Supabase Storage
+ * POST /api/upload/image
+ * Body: multipart/form-data with 'file' field
+ * Optional query param: ?folder=blog (to organize files)
+ */
+export async function uploadImage(req, res) {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        if (!supabase) {
+            return res.status(500).json({ error: 'Storage service unavailable' });
+        }
+        const file = req.file;
+        const folder = req.query.folder || 'general';
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 8);
+        const ext = path.extname(file.originalname);
+        const filename = `${folder}/${timestamp}-${randomString}${ext}`;
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+            .upload(filename, file.buffer, {
+            contentType: file.mimetype,
+            cacheControl: '3600',
+            upsert: false
+        });
+        if (error) {
+            console.error('Failed to upload image:', error.message);
+            return res.status(500).json({ error: 'Failed to upload image' });
+        }
+        // Get public URL
+        const { data: urlData } = supabase.storage
+            .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+            .getPublicUrl(data.path);
+        return res.status(201).json({
+            success: true,
+            message: 'Image uploaded successfully',
+            data: {
+                path: data.path,
+                url: urlData.publicUrl,
+                size: file.size,
+                mimetype: file.mimetype
+            }
+        });
+    }
+    catch (err) {
+        console.error('Upload image error:', err.message || err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+/**
+ * Upload multiple images to Supabase Storage
+ * POST /api/upload/images
+ * Body: multipart/form-data with 'files' field (multiple files)
+ * Optional query param: ?folder=gallery
+ */
+export async function uploadImages(req, res) {
+    try {
+        if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+            return res.status(400).json({ error: 'No files uploaded' });
+        }
+        if (!supabase) {
+            return res.status(500).json({ error: 'Storage service unavailable' });
+        }
+        const files = req.files;
+        const folder = req.query.folder || 'general';
+        const uploadedFiles = [];
+        const errors = [];
+        // Upload each file
+        for (const file of files) {
+            try {
+                // Generate unique filename
+                const timestamp = Date.now();
+                const randomString = Math.random().toString(36).substring(2, 8);
+                const ext = path.extname(file.originalname);
+                const filename = `${folder}/${timestamp}-${randomString}${ext}`;
+                // Upload to Supabase Storage
+                const { data, error } = await supabase.storage
+                    .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+                    .upload(filename, file.buffer, {
+                    contentType: file.mimetype,
+                    cacheControl: '3600',
+                    upsert: false
+                });
+                if (error) {
+                    errors.push({
+                        filename: file.originalname,
+                        error: error.message
+                    });
+                    continue;
+                }
+                // Get public URL
+                const { data: urlData } = supabase.storage
+                    .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+                    .getPublicUrl(data.path);
+                uploadedFiles.push({
+                    originalName: file.originalname,
+                    path: data.path,
+                    url: urlData.publicUrl,
+                    size: file.size,
+                    mimetype: file.mimetype
+                });
+            }
+            catch (err) {
+                errors.push({
+                    filename: file.originalname,
+                    error: err.message || 'Unknown error'
+                });
+            }
+        }
+        return res.status(201).json({
+            success: true,
+            message: `Uploaded ${uploadedFiles.length} of ${files.length} files`,
+            data: {
+                uploaded: uploadedFiles,
+                errors: errors.length > 0 ? errors : undefined
+            }
+        });
+    }
+    catch (err) {
+        console.error('Upload images error:', err.message || err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+/**
+ * Delete image from Supabase Storage
+ * DELETE /api/upload/image
+ * Body: { path: 'folder/filename.jpg' }
+ */
+export async function deleteImage(req, res) {
+    try {
+        const { path: filePath } = req.body;
+        if (!filePath) {
+            return res.status(400).json({ error: 'File path is required' });
+        }
+        if (!supabase) {
+            return res.status(500).json({ error: 'Storage service unavailable' });
+        }
+        const { error } = await supabase.storage
+            .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+            .remove([filePath]);
+        if (error) {
+            console.error('Failed to delete image:', error.message);
+            return res.status(500).json({ error: 'Failed to delete image' });
+        }
+        return res.json({
+            success: true,
+            message: 'Image deleted successfully'
+        });
+    }
+    catch (err) {
+        console.error('Delete image error:', err.message || err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+/**
+ * List images in a folder
+ * GET /api/upload/images/:folder?
+ */
+export async function listImages(req, res) {
+    try {
+        const folder = req.params.folder || '';
+        if (!supabase) {
+            return res.status(500).json({ error: 'Storage service unavailable' });
+        }
+        const { data, error } = await supabase.storage
+            .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+            .list(folder, {
+            limit: 100,
+            offset: 0,
+            sortBy: { column: 'created_at', order: 'desc' }
+        });
+        if (error) {
+            console.error('Failed to list images:', error.message);
+            return res.status(500).json({ error: 'Failed to list images' });
+        }
+        // Get public URLs for each file
+        const filesWithUrls = data.map(file => {
+            const { data: urlData } = supabase.storage
+                .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
+                .getPublicUrl(`${folder}${folder ? '/' : ''}${file.name}`);
+            return {
+                name: file.name,
+                url: urlData.publicUrl,
+                size: file.metadata?.size,
+                contentType: file.metadata?.mimetype,
+                createdAt: file.created_at,
+                updatedAt: file.updated_at
+            };
+        });
+        return res.json({
+            success: true,
+            data: filesWithUrls
+        });
+    }
+    catch (err) {
+        console.error('List images error:', err.message || err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}

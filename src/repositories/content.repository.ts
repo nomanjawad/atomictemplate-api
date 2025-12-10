@@ -4,15 +4,15 @@
  */
 
 import { BaseRepository } from './base.repository.js'
-import {
+import type {
   CommonContent,
   PageContent,
   CreateCommonContentInput,
   UpdateCommonContentInput,
   CreatePageContentInput,
   UpdatePageContentInput
-} from '../types/content.js'
-import { DatabaseError } from '../utils/errors.js'
+} from '../types/index.js'
+import { DatabaseError } from '@utils'
 
 /**
  * Common Content Repository

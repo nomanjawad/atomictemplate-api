@@ -1,5 +1,15 @@
 /**
+ * @module controllers/admin
+ * @description Admin system status and configuration controller
+ */
+/**
  * Get admin/system status
+ * @param {Request} _req - Express request object
+ * @param {Response} res - Express response object
+ * @returns {Response} JSON response with system status
+ * @example
+ * // GET /api/admin/status
+ * // Response: { status: 'operational', environment: 'development', ... }
  */
 export function adminStatus(_req, res) {
     return res.json({

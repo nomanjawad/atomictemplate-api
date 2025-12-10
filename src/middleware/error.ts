@@ -4,8 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express'
-import { logger } from '../utils/logger.js'
-import { AppError, UnprocessableEntityError } from '../utils/errors.js'
+import { logger, AppError, UnprocessableEntityError } from '@utils'
 
 /**
  * Global error handler middleware

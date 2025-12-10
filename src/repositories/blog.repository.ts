@@ -4,8 +4,8 @@
  */
 
 import { BaseRepository } from './base.repository.js'
-import { BlogPost, CreateBlogPostInput, UpdateBlogPostInput } from '../types/blog.js'
-import { DatabaseError, ConflictError } from '../utils/errors.js'
+import type { BlogPost, CreateBlogPostInput, UpdateBlogPostInput } from '../types/index.js'
+import { DatabaseError, ConflictError } from '@utils'
 
 /**
  * Blog Repository

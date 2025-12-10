@@ -1,4 +1,4 @@
-import { supabase } from '../db/supabaseClient.js';
+import { supabase } from '@db';
 /**
  * Register a new user using Supabase Auth
  * Uses signUp which allows public registration
@@ -6,13 +6,13 @@ import { supabase } from '../db/supabaseClient.js';
 export async function register(req, res) {
     const { email, password, full_name } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ error: 'email and password required' });
+        return res.status(400).json({ error: 'Email and password are required' });
     }
     if (!supabase) {
-        return res.status(500).json({ error: 'Supabase client not configured' });
+        console.error('Supabase client not configured - check environment variables');
+        return res.status(500).json({ error: 'Authentication service unavailable' });
     }
     try {
-        // Sign up a new user with Supabase Auth
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
@@ -23,6 +23,7 @@ export async function register(req, res) {
             }
         });
         if (error) {
+            console.error('Registration error:', error.message);
             return res.status(400).json({ error: error.message });
         }
         return res.status(201).json({
@@ -32,8 +33,8 @@ export async function register(req, res) {
         });
     }
     catch (err) {
-        console.error('Registration error:', err);
-        return res.status(500).json({ error: 'Unknown server error' });
+        console.error('Registration failed:', err.message || err);
+        return res.status(500).json({ error: 'Registration failed. Please try again.' });
     }
 }
 /**
@@ -42,14 +43,16 @@ export async function register(req, res) {
 export async function login(req, res) {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(400).json({ error: 'email and password required' });
+        return res.status(400).json({ error: 'Email and password are required' });
     }
     if (!supabase) {
-        return res.status(500).json({ error: 'Supabase client not configured' });
+        console.error('Supabase client not configured - check environment variables');
+        return res.status(500).json({ error: 'Authentication service unavailable' });
     }
     try {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
+            console.error('Login error:', error.message);
             return res.status(401).json({ error: error.message });
         }
         return res.json({
@@ -59,8 +62,8 @@ export async function login(req, res) {
         });
     }
     catch (err) {
-        console.error('Login error:', err);
-        return res.status(500).json({ error: 'Unknown server error' });
+        console.error('Login failed:', err.message || err);
+        return res.status(500).json({ error: 'Login failed. Please try again.' });
     }
 }
 /**
@@ -68,17 +71,46 @@ export async function login(req, res) {
  */
 export async function logout(_req, res) {
     if (!supabase) {
-        return res.status(500).json({ error: 'Supabase client not configured' });
+        console.error('Supabase client not configured - check environment variables');
+        return res.status(500).json({ error: 'Authentication service unavailable' });
     }
     try {
         const { error } = await supabase.auth.signOut();
         if (error) {
+            console.error('Logout error:', error.message);
             return res.status(400).json({ error: error.message });
         }
         return res.json({ message: 'Logout successful' });
     }
     catch (err) {
-        console.error('Logout error:', err);
-        return res.status(500).json({ error: 'Unknown server error' });
+        console.error('Logout failed:', err.message || err);
+        return res.status(500).json({ error: 'Logout failed. Please try again.' });
+    }
+}
+/**
+ * Get current user profile (JWT protected endpoint)
+ * Demonstrates JWT authentication in action
+ */
+export async function getProfile(req, res) {
+    try {
+        // User is attached by requireAuth middleware after JWT verification
+        const user = req.user;
+        if (!user) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
+        return res.json({
+            user: {
+                id: user.id,
+                email: user.email,
+                full_name: user.user_metadata?.full_name,
+                avatar_url: user.user_metadata?.avatar_url,
+                created_at: user.created_at,
+                email_confirmed_at: user.email_confirmed_at
+            }
+        });
+    }
+    catch (err) {
+        console.error('Get profile failed:', err.message || err);
+        return res.status(500).json({ error: 'Failed to retrieve profile' });
     }
 }

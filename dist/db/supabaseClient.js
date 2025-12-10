@@ -1,16 +1,30 @@
+/**
+ * @module db/supabaseClient
+ * @description Supabase client initialization and configuration
+ */
 import { createClient } from '@supabase/supabase-js';
+/** @constant {string} Supabase project URL from environment */
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
-const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
+/**
+ * @constant {string} Supabase anonymous key
+ * Supports both SUPABASE_ANON_KEY and NEXT_PUBLIC_SUPABASE_ANON_KEY for flexibility
+ */
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    '';
 if (!SUPABASE_URL) {
-    console.warn('SUPABASE_URL is not set — Supabase client will not be available');
+    console.error('SUPABASE_URL is not set');
 }
-if (!SUPABASE_PUBLISHABLE_KEY) {
-    console.warn('SUPABASE_PUBLISHABLE_KEY is not set — Supabase client will not be available');
+if (!SUPABASE_KEY) {
+    console.error('No Supabase key found in environment variables');
 }
-// Create a single Supabase client using the publishable key
-// This client will use Supabase Auth for authentication and RLS for security
-export const supabase = SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+/**
+ * Supabase client instance
+ * Configured with auto token refresh, no session persistence (backend)
+ * @type {SupabaseClient | null}
+ */
+export const supabase = SUPABASE_URL && SUPABASE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_KEY, {
         auth: {
             autoRefreshToken: true,
             persistSession: false, // Backend doesn't need to persist sessions
@@ -18,9 +32,12 @@ export const supabase = SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY
         }
     })
     : null;
-// Export as supabaseClient for backwards compatibility
-export const supabaseClient = supabase;
-// Legacy warning for old environment variable names
-if (process.env.SUPABASE_ANON_KEY && !SUPABASE_PUBLISHABLE_KEY) {
-    console.warn('Using legacy SUPABASE_ANON_KEY — consider switching to SUPABASE_PUBLISHABLE_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY');
+// Log initialization status only on failure
+if (!supabase) {
+    console.error('Supabase client failed to initialize');
 }
+/**
+ * Alias for supabase client (backwards compatibility)
+ * @type {SupabaseClient | null}
+ */
+export const supabaseClient = supabase;

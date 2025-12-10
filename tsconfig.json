@@ -7,41 +7,54 @@
         ],
         "outDir": "dist",
         "rootDir": "src",
-        "ignoreDeprecations": "6.0",
-        "baseUrl": ".",
         "paths": {
             "@controllers": [
-                "src/controllers/index.ts"
+                "./src/controllers/index.ts"
             ],
             "@controllers/*": [
-                "src/controllers/*"
+                "./src/controllers/*"
             ],
             "@db": [
-                "src/db/index.ts"
+                "./src/db/index.ts"
             ],
             "@db/*": [
-                "src/db/*"
+                "./src/db/*"
             ],
             "@middleware": [
-                "src/middleware/index.ts"
+                "./src/middleware/index.ts"
             ],
             "@middleware/*": [
-                "src/middleware/*"
+                "./src/middleware/*"
             ],
             "@repositories": [
-                "src/repositories/index.ts"
+                "./src/repositories/index.ts"
             ],
             "@repositories/*": [
-                "src/repositories/*"
+                "./src/repositories/*"
             ],
             "@routes/*": [
-                "src/routes/*"
+                "./src/routes/*"
+            ],
+            "@types": [
+                "./src/types/index.ts"
             ],
             "@types/*": [
-                "src/types/*"
+                "./src/types/*"
+            ],
+            "@utils": [
+                "./src/utils/index.ts"
             ],
             "@utils/*": [
-                "src/utils/*"
+                "./src/utils/*"
+            ],
+            "@validators": [
+                "./src/validators/index.ts"
+            ],
+            "@validators/*": [
+                "./src/validators/*"
+            ],
+            "@config": [
+                "./src/config/index.ts"
             ]
         },
         "esModuleInterop": true,
@@ -52,6 +65,7 @@
         "resolveJsonModule": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
+        "isolatedModules": true,
         "types": [
             "node"
         ]
