@@ -4,6 +4,7 @@
  */
 import { Request, Response } from 'express'
 import { supabase } from '@db'
+import { logger } from '@utils'
 import multer from 'multer'
 import path from 'path'
 
@@ -76,7 +77,7 @@ export async function uploadImage(req: Request, res: Response) {
       })
 
     if (error) {
-      console.error('Failed to upload image:', error.message)
+      logger.error('Failed to upload image', { error: error.message })
       return res.status(500).json({ error: 'Failed to upload image' })
     }
 
@@ -96,7 +97,7 @@ export async function uploadImage(req: Request, res: Response) {
       }
     })
   } catch (err: any) {
-    console.error('Upload image error:', err.message || err)
+    logger.error('Upload image error', { error: err.message || err })
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
@@ -177,7 +178,7 @@ export async function uploadImages(req: Request, res: Response) {
       }
     })
   } catch (err: any) {
-    console.error('Upload images error:', err.message || err)
+    logger.error('Upload images error', { error: err.message || err })
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
@@ -204,7 +205,7 @@ export async function deleteImage(req: Request, res: Response) {
       .remove([filePath])
 
     if (error) {
-      console.error('Failed to delete image:', error.message)
+      logger.error('Failed to delete image', { error: error.message })
       return res.status(500).json({ error: 'Failed to delete image' })
     }
 
@@ -213,7 +214,7 @@ export async function deleteImage(req: Request, res: Response) {
       message: 'Image deleted successfully'
     })
   } catch (err: any) {
-    console.error('Delete image error:', err.message || err)
+    logger.error('Delete image error', { error: err.message || err })
     return res.status(500).json({ error: 'Internal server error' })
   }
 }
@@ -239,7 +240,7 @@ export async function listImages(req: Request, res: Response) {
       })
 
     if (error) {
-      console.error('Failed to list images:', error.message)
+      logger.error('Failed to list images', { error: error.message })
       return res.status(500).json({ error: 'Failed to list images' })
     }
 
@@ -264,7 +265,7 @@ export async function listImages(req: Request, res: Response) {
       data: filesWithUrls
     })
   } catch (err: any) {
-    console.error('List images error:', err.message || err)
+    logger.error('List images error', { error: err.message || err })
     return res.status(500).json({ error: 'Internal server error' })
   }
 }

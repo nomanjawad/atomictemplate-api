@@ -1,5 +1,6 @@
 import { supabase } from '@db'
 import type { Session } from '@supabase/supabase-js'
+import { logger } from '@utils'
 
 /**
  * Session Controller
@@ -30,13 +31,13 @@ export async function setUserSession(tokens: SessionTokens): Promise<{
     })
 
     if (error) {
-      console.error('Failed to set session:', error.message)
+      logger.error('Failed to set session', { error: error.message })
       return { session: null, error }
     }
 
     return { session: data.session, error: null }
   } catch (err: any) {
-    console.error('Session error:', err.message || err)
+    logger.error('Session error', { error: err.message || err })
     return { session: null, error: err }
   }
 }
@@ -83,13 +84,13 @@ export async function refreshSession(refresh_token: string): Promise<{
     })
 
     if (error) {
-      console.error('Failed to refresh session:', error.message)
+      logger.error('Failed to refresh session', { error: error.message })
       return { session: null, error }
     }
 
     return { session: data.session, error: null }
   } catch (err: any) {
-    console.error('Refresh error:', err.message || err)
+    logger.error('Refresh error', { error: err.message || err })
     return { session: null, error: err }
   }
 }

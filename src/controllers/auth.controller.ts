@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { supabase } from '@db'
+import { logger } from '@utils'
 
 /**
  * Register a new user using Supabase Auth
@@ -13,7 +14,7 @@ export async function register(req: Request, res: Response) {
   }
 
   if (!supabase) {
-    console.error('Supabase client not configured - check environment variables')
+    logger.error('Supabase client not configured - check environment variables')
     return res.status(500).json({ error: 'Authentication service unavailable' })
   }
 
@@ -29,7 +30,7 @@ export async function register(req: Request, res: Response) {
     })
 
     if (error) {
-      console.error('Registration error:', error.message)
+      logger.error('Registration error', { error: error.message })
       return res.status(400).json({ error: error.message })
     }
 
@@ -39,7 +40,7 @@ export async function register(req: Request, res: Response) {
       session: data.session
     })
   } catch (err: any) {
-    console.error('Registration failed:', err.message || err)
+    logger.error('Registration failed', { error: err.message || err })
     return res.status(500).json({ error: 'Registration failed. Please try again.' })
   }
 }
@@ -55,7 +56,7 @@ export async function login(req: Request, res: Response) {
   }
 
   if (!supabase) {
-    console.error('Supabase client not configured - check environment variables')
+    logger.error('Supabase client not configured - check environment variables')
     return res.status(500).json({ error: 'Authentication service unavailable' })
   }
 
@@ -63,7 +64,7 @@ export async function login(req: Request, res: Response) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      console.error('Login error:', error.message)
+      logger.error('Login error', { error: error.message })
       return res.status(401).json({ error: error.message })
     }
 
@@ -73,7 +74,7 @@ export async function login(req: Request, res: Response) {
       session: data.session
     })
   } catch (err: any) {
-    console.error('Login failed:', err.message || err)
+    logger.error('Login failed', { error: err.message || err })
     return res.status(500).json({ error: 'Login failed. Please try again.' })
   }
 }
@@ -83,7 +84,7 @@ export async function login(req: Request, res: Response) {
  */
 export async function logout(_req: Request, res: Response) {
   if (!supabase) {
-    console.error('Supabase client not configured - check environment variables')
+    logger.error('Supabase client not configured - check environment variables')
     return res.status(500).json({ error: 'Authentication service unavailable' })
   }
 
@@ -91,13 +92,13 @@ export async function logout(_req: Request, res: Response) {
     const { error } = await supabase.auth.signOut()
 
     if (error) {
-      console.error('Logout error:', error.message)
+      logger.error('Logout error', { error: error.message })
       return res.status(400).json({ error: error.message })
     }
 
     return res.json({ message: 'Logout successful' })
   } catch (err: any) {
-    console.error('Logout failed:', err.message || err)
+    logger.error('Logout failed', { error: err.message || err })
     return res.status(500).json({ error: 'Logout failed. Please try again.' })
   }
 }
@@ -126,7 +127,7 @@ export async function getProfile(req: Request, res: Response) {
       }
     })
   } catch (err: any) {
-    console.error('Get profile failed:', err.message || err)
+    logger.error('Get profile failed', { error: err.message || err })
     return res.status(500).json({ error: 'Failed to retrieve profile' })
   }
 }

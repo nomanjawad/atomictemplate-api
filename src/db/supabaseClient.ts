@@ -4,6 +4,7 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { logger } from '../utils/logger.js'
 
 /** @constant {string} Supabase project URL from environment */
 const SUPABASE_URL = process.env.SUPABASE_URL || ''
@@ -18,11 +19,11 @@ const SUPABASE_KEY =
   ''
 
 if (!SUPABASE_URL) {
-  console.error('SUPABASE_URL is not set')
+  logger.error('SUPABASE_URL is not set')
 }
 
 if (!SUPABASE_KEY) {
-  console.error('No Supabase key found in environment variables')
+  logger.error('No Supabase key found in environment variables')
 }
 
 /**
@@ -43,7 +44,7 @@ export const supabase: SupabaseClient | null =
 
 // Log initialization status only on failure
 if (!supabase) {
-  console.error('Supabase client failed to initialize')
+  logger.error('Supabase client failed to initialize')
 }
 
 /**

@@ -5,6 +5,7 @@
  */
 
 import { z } from 'zod'
+import { logger } from '../utils/logger.js'
 
 /**
  * Environment variables schema
@@ -72,8 +73,9 @@ function validateEnv() {
   const parsed = envSchema.safeParse(process.env)
 
   if (!parsed.success) {
-    console.error('❌ Invalid environment variables:')
-    console.error(JSON.stringify(parsed.error.flatten().fieldErrors, null, 2))
+    logger.error('Invalid environment variables', {
+      errors: parsed.error.flatten().fieldErrors
+    })
     throw new Error('Invalid environment configuration. Check your .env file.')
   }
 
@@ -97,14 +99,12 @@ export const isTest = config.NODE_ENV === 'test'
  * Log configuration summary (without sensitive data)
  */
 export function logConfigSummary() {
-  console.log('\n📋 Configuration Summary:')
-  console.log(`  Environment: ${config.NODE_ENV}`)
-  console.log(`  Port: ${config.PORT}`)
-  console.log(`  Supabase URL: ${config.SUPABASE_URL}`)
-  console.log(`  Storage Bucket: ${config.SUPABASE_STORAGE_BUCKET}`)
-  console.log(`  CORS Origin: ${config.CORS_ALLOWED_ORIGIN}`)
-  if (config.FRONTEND_URL) {
-    console.log(`  Frontend URL: ${config.FRONTEND_URL}`)
-  }
-  console.log('')
+  logger.info('Configuration Summary', {
+    environment: config.NODE_ENV,
+    port: config.PORT,
+    supabaseUrl: config.SUPABASE_URL,
+    storageBucket: config.SUPABASE_STORAGE_BUCKET,
+    corsOrigin: config.CORS_ALLOWED_ORIGIN,
+    frontendUrl: config.FRONTEND_URL || 'not set'
+  })
 }
