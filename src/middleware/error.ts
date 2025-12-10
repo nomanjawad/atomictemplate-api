@@ -23,7 +23,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     method: req.method,
     url: req.url,
     ip: req.ip,
-    userId: (req as any).user?.id,
+    userId: req.user?.id,
     stack: err.stack,
   }
 

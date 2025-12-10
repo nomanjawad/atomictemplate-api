@@ -246,7 +246,7 @@ export async function listImages(req: Request, res: Response) {
 
     // Get public URLs for each file
     const filesWithUrls = data.map(file => {
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = supabase!.storage
         .from(process.env.SUPABASE_STORAGE_BUCKET || 'images')
         .getPublicUrl(`${folder}${folder ? '/' : ''}${file.name}`)
 

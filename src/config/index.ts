@@ -22,7 +22,7 @@ const envSchema = z.object({
     .string()
     .regex(/^\d+$/)
     .transform(Number)
-    .default('3000'),
+    .default(3000),
 
   // Supabase configuration (required)
   SUPABASE_URL: z

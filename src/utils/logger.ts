@@ -56,7 +56,7 @@ const consoleFormat = winston.format.combine(
 )
 
 // Define transports
-const transports = [
+const transports: winston.transport[] = [
   // Console transport for all environments
   new winston.transports.Console({
     format: process.env.NODE_ENV === 'production' ? format : consoleFormat,

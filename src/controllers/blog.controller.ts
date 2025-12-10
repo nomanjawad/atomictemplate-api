@@ -18,7 +18,7 @@ const blogRepo = new BlogRepository()
 export async function list(req: Request, res: Response, next: NextFunction) {
   try {
     const { published, limit = '10', offset = '0' } = req.query
-    const user = (req as any).user
+    const user = req.user
 
     // Non-authenticated users can only see published posts
     const publishedOnly = !user || published === 'true'
@@ -48,7 +48,7 @@ export async function list(req: Request, res: Response, next: NextFunction) {
 export async function get(req: Request, res: Response, next: NextFunction) {
   try {
     const { slug } = req.params
-    const user = (req as any).user
+    const user = req.user
 
     const post = await blogRepo.findBySlug(slug)
 
@@ -77,7 +77,7 @@ export async function get(req: Request, res: Response, next: NextFunction) {
  */
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
-    const user = (req as any).user
+    const user = req.user
     const { slug, title, excerpt, content, featured_image, tags, meta_data, published } = req.body
 
     if (!slug || !title || !content) {

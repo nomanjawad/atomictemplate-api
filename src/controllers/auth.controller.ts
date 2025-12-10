@@ -110,7 +110,7 @@ export async function logout(_req: Request, res: Response) {
 export async function getProfile(req: Request, res: Response) {
   try {
     // User is attached by requireAuth middleware after JWT verification
-    const user = (req as any).user
+    const user = req.user
 
     if (!user) {
       return res.status(401).json({ error: 'User not authenticated' })

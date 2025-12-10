@@ -2,6 +2,8 @@
 
 Base URL: `http://localhost:3000/api`
 
+---
+
 ## Health Check
 
 ### GET /health
@@ -13,7 +15,7 @@ Check service health status.
   "ok": true,
   "status": {
     "healthy": true,
-    "timestamp": "2025-12-09T08:00:00.000Z",
+    "timestamp": "2025-12-10T09:00:00.000Z",
     "services": {
       "supabaseAPI": { "ok": true },
       "supabaseAuth": { "ok": true, "sessionActive": false },
@@ -30,7 +32,7 @@ Check service health status.
 ### POST /auth/register
 Register a new user.
 
-**Request Body:**
+**Request:**
 ```json
 {
   "email": "user@example.com",
@@ -40,20 +42,13 @@ Register a new user.
 ```
 
 **Response:** `201 Created`
-```json
-{
-  "message": "User registered successfully",
-  "user": { "id": "...", "email": "user@example.com" },
-  "session": { "access_token": "...", "refresh_token": "..." }
-}
-```
 
 ---
 
 ### POST /auth/login
 Login with email and password.
 
-**Request Body:**
+**Request:**
 ```json
 {
   "email": "user@example.com",
@@ -61,47 +56,109 @@ Login with email and password.
 }
 ```
 
-**Response:** `200 OK`
-```json
-{
-  "message": "Login successful",
-  "user": { "id": "...", "email": "user@example.com" },
-  "session": {
-    "access_token": "eyJ...",
-    "refresh_token": "...",
-    "expires_in": 259200
-  }
-}
-```
+**Response:** `200 OK` with access_token, refresh_token
 
 ---
 
 ### POST /auth/logout
 Logout current user.
 
-**Response:** `200 OK`
+---
+
+### GET /auth/me 🔒
+Get current user profile. Requires `Authorization: Bearer <token>` header.
+
+---
+
+## Content Management
+
+### Common Content (header, footer, CTA, etc.)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/content/common` | List all common content |
+| GET | `/content/common/:key` | Get by key |
+| PUT | `/content/common/:key` | Create/update by key 🔒 |
+| DELETE | `/content/common/:key` | Delete by key 🔒 |
+
+**PUT Request:**
 ```json
-{ "message": "Logout successful" }
+{
+  "data": { "title": "...", "description": "..." }
+}
 ```
 
 ---
 
-### GET /auth/me
-Get current user profile. **Requires authentication.**
+### Page Content (home, about, contact, etc.)
 
-**Headers:**
-```
-Authorization: Bearer <access_token>
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/content/pages` | List all pages |
+| GET | `/content/pages/:slug` | Get page by slug |
+| PUT | `/content/pages/:slug` | Create/update page 🔒 |
+| DELETE | `/content/pages/:slug` | Delete page 🔒 |
 
-**Response:** `200 OK`
+**PUT Request:**
 ```json
 {
-  "user": {
-    "id": "...",
-    "email": "user@example.com",
-    "full_name": "John Doe",
-    "created_at": "..."
+  "title": "About Us",
+  "data": { "banner": {...}, "sections": [...] },
+  "meta_data": { "metaTitle": "...", "metaDescription": "..." },
+  "published": true
+}
+```
+
+---
+
+## Blog Posts
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/blog` | List posts (?published=true&limit=10&offset=0) |
+| GET | `/blog/:slug` | Get post by slug |
+| POST | `/blog` | Create post 🔒 |
+| PUT | `/blog/:slug` | Update post 🔒 |
+| DELETE | `/blog/:slug` | Delete post 🔒 |
+| POST | `/blog/:slug/publish` | Publish post 🔒 |
+| POST | `/blog/:slug/unpublish` | Unpublish post 🔒 |
+
+**POST/PUT Request:**
+```json
+{
+  "slug": "my-post",
+  "title": "My Post Title",
+  "excerpt": "Short description",
+  "content": { "blocks": [...] },
+  "featured_image": "https://...",
+  "tags": ["news", "update"],
+  "published": false
+}
+```
+
+---
+
+## File Upload
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/upload/image` | Upload single image |
+| POST | `/upload/images` | Upload multiple images |
+| GET | `/upload/images/:folder?` | List images in folder |
+| DELETE | `/upload/image` | Delete image |
+
+**Upload Request:** `multipart/form-data` with `file` field  
+**Query param:** `?folder=blog` to organize by folder
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "path": "blog/123456-abc.jpg",
+    "url": "https://...supabase.co/storage/v1/object/public/images/...",
+    "size": 12345,
+    "mimetype": "image/jpeg"
   }
 }
 ```
@@ -113,34 +170,6 @@ Authorization: Bearer <access_token>
 ### GET /admin/status
 Get system configuration status.
 
-**Response:**
-```json
-{
-  "message": "Admin status",
-  "environment": {
-    "nodeEnv": "development",
-    "url": "configured",
-    "publishableKey": "configured"
-  }
-}
-```
-
 ---
 
-## Blog
-
-### GET /blog
-List all blog posts.
-
-**Response:**
-```json
-{ "data": [...] }
-```
-
-### GET /blog/:slug
-Get a blog post by slug.
-
-**Response:**
-```json
-{ "data": { "slug": "...", "title": "...", "content": "..." } }
-```
+🔒 = Requires authentication (`Authorization: Bearer <token>`)

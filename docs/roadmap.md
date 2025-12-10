@@ -1,29 +1,30 @@
 # Roadmap
 
-## Current Status ✅
+## Completed ✅
 
-- Express server with TypeScript
-- Supabase Auth integration
-- JWT-based authentication
-- Session management
-- Health check system
-- Path aliases for clean imports
+- [x] Express server with TypeScript
+- [x] Supabase Auth integration
+- [x] JWT-based authentication
+- [x] Session management
+- [x] Health check system
+- [x] Path aliases for clean imports
+- [x] Repository pattern for data access
+- [x] Winston logging
+- [x] Zod validation with @atomictemplate/validations
+- [x] **Blog Posts** - Full CRUD with publish/unpublish
+- [x] **Content Management** - Common + Page content (JSONB)
+- [x] **File Upload** - Single/multiple images to Supabase Storage
+- [x] Database migrations (users, content_common, content_pages, blog_posts)
 
 ---
 
 ## Planned Features
 
-### Phase 1: Content Management
-
-- [ ] **Blog Posts**
-  - Create `blog_posts` table
-  - CRUD endpoints
-  - Rich text content support
-  - SEO metadata
+### Phase 1: Content Enhancements
 
 - [ ] **Gallery System**
   - Create `gallery` table
-  - Image upload to Supabase Storage
+  - Gallery management endpoints
   - Categories and tags
 
 - [ ] **Success Stories**
@@ -56,7 +57,7 @@
 
 ### Phase 4: Quality & Deployment
 
-- [ ] **Testing**
+- [ ] **Testing** (in progress)
   - Unit tests with Jest
   - Integration tests
   - E2E API tests
@@ -64,7 +65,6 @@
 - [ ] **Documentation**
   - OpenAPI/Swagger spec
   - Deployment guide
-  - Contributing guide
 
 - [ ] **DevOps**
   - CI/CD pipeline
@@ -75,14 +75,9 @@
 
 ## Database Migrations
 
-Create new migrations with Supabase CLI:
-
 ```bash
-# Install Supabase CLI
-brew install supabase/tap/supabase
-
 # Create migration
-supabase migration new create_blog_posts
+supabase migration new create_gallery
 
 # Apply migrations
 supabase db push

@@ -105,7 +105,7 @@ export async function deleteCommonContent(req: Request, res: Response, next: Nex
 export async function listPages(req: Request, res: Response, next: NextFunction) {
   try {
     const { published } = req.query
-    const user = (req as any).user
+    const user = req.user
 
     // Non-authenticated users can only see published pages
     const data = published === 'true' || !user
@@ -125,7 +125,7 @@ export async function listPages(req: Request, res: Response, next: NextFunction)
 export async function getPage(req: Request, res: Response, next: NextFunction) {
   try {
     const { slug } = req.params
-    const user = (req as any).user
+    const user = req.user
 
     const page = await pageRepo.findBySlug(slug)
 

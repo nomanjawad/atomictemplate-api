@@ -29,7 +29,7 @@ export const UpsertCommonContentValidator = z.object({
     key: z.string().min(1).max(100).regex(/^[a-z_]+$/, 'Key must be lowercase letters and underscores only')
   }),
   body: z.object({
-    data: z.record(z.any()) // JSONB - validated by specific schema based on key
+    data: z.record(z.string(), z.any()) // JSONB - validated by specific schema based on key
   })
 })
 
@@ -49,7 +49,7 @@ export const UpsertPageContentValidator = z.object({
   }),
   body: z.object({
     title: z.string().min(1).max(200),
-    data: z.record(z.any()), // JSONB - validated by page-specific schema
+    data: z.record(z.string(), z.any()), // JSONB - validated by page-specific schema
     meta_data: z.object({
       metaTitle: z.string().max(100).optional(),
       metaDescription: z.string().max(200).optional()
