@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx watch --env-file=.env src/server.ts",
+    "dev": "nodemon",
+    "dev:tsx": "tsx watch --env-file=.env src/server.ts",
     "start": "node --env-file=.env dist/server.js",
     "build": "tsc && tsc-alias",
     "lint": "eslint . --ext .ts",
@@ -11,7 +12,8 @@
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest --testPathIgnorePatterns='/integration.test.ts$/'",
-    "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest integration.test.ts"
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest integration.test.ts",
+    "seed:home": "tsx --env-file=.env scripts/seed-home-page.ts"
   },
   "engines": {
     "node": ">=20"
@@ -44,6 +46,7 @@
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.6",

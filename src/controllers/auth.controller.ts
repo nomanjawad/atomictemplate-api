@@ -5,12 +5,25 @@ import { logger } from '@utils'
 /**
  * Register a new user using Supabase Auth
  * Uses signUp which allows public registration
+ * Supabase enforces unique email constraint
  */
 export async function register(req: Request, res: Response) {
   const { email, password, full_name } = req.body
 
+  // Validate required fields
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' })
+  }
+
+  // Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Invalid email format' })
+  }
+
+  // Validate password strength (minimum 6 characters)
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters long' })
   }
 
   if (!supabase) {
@@ -30,9 +43,38 @@ export async function register(req: Request, res: Response) {
     })
 
     if (error) {
-      logger.error('Registration error', { error: error.message })
+      // Handle specific Supabase errors
+      if (error.message.includes('already registered') || error.message.includes('already exists')) {
+        logger.warn('Registration attempted with existing email', { email })
+        return res.status(409).json({ error: 'Email already registered. Please login instead.' })
+      }
+
+      logger.error('Registration error', { error: error.message, email })
       return res.status(400).json({ error: error.message })
     }
+
+    // Check if user was actually created
+    if (!data.user) {
+      logger.warn('Registration succeeded but no user returned', { email })
+      return res.status(201).json({
+        message: 'Registration successful. Please check your email to confirm your account.',
+        requiresEmailConfirmation: true
+      })
+    }
+
+    // IMPORTANT: Supabase returns success for duplicate emails to prevent email enumeration
+    // When email is duplicate: data.user exists BUT data.session is null
+    // and user.identities will be empty OR user was not newly created
+    if (!data.session || !data.user.identities || data.user.identities.length === 0) {
+      logger.warn('Registration attempted with existing email (no session created)', {
+        email,
+        hasSession: !!data.session,
+        identitiesCount: data.user.identities?.length || 0
+      })
+      return res.status(409).json({ error: 'Email already registered. Please login instead.' })
+    }
+
+    logger.info('User registered successfully', { userId: data.user.id, email })
 
     return res.status(201).json({
       message: 'User registered successfully',
@@ -40,7 +82,7 @@ export async function register(req: Request, res: Response) {
       session: data.session
     })
   } catch (err: any) {
-    logger.error('Registration failed', { error: err.message || err })
+    logger.error('Registration failed', { error: err.message || err, email })
     return res.status(500).json({ error: 'Registration failed. Please try again.' })
   }
 }
@@ -129,5 +171,44 @@ export async function getProfile(req: Request, res: Response) {
   } catch (err: any) {
     logger.error('Get profile failed', { error: err.message || err })
     return res.status(500).json({ error: 'Failed to retrieve profile' })
+  }
+}
+
+/**
+ * Verify JWT token authentication
+ * GET endpoint that verifies if the provided JWT token is valid
+ * Uses Supabase's native JWT verification via getUser()
+ *
+ * @returns { authenticated: boolean, user?: object }
+ */
+export async function verifyToken(req: Request, res: Response) {
+  try {
+    // User is already verified by requireAuth middleware
+    const user = req.user
+
+    if (!user) {
+      return res.json({
+        authenticated: false,
+        message: 'No valid token provided'
+      })
+    }
+
+    logger.info('Token verification successful', { userId: user.id })
+
+    return res.json({
+      authenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name,
+        created_at: user.created_at
+      }
+    })
+  } catch (err: any) {
+    logger.error('Token verification failed', { error: err.message || err })
+    return res.json({
+      authenticated: false,
+      message: 'Token verification failed'
+    })
   }
 }

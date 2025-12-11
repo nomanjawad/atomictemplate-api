@@ -62,9 +62,19 @@
     </div>
   </div>
 
+  <script src="/js/auth.js"></script>
   <script>
     const form = document.getElementById('loginForm');
     const messageDiv = document.getElementById('message');
+
+    // Check if already logged in when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Login page: DOM loaded');
+      if (auth.isAuthenticated()) {
+        console.log('Login page: Already authenticated, redirecting...');
+        window.location.href = auth.getRedirectUrl();
+      }
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -75,53 +85,28 @@
 
       messageDiv.classList.add('hidden');
 
-      const formData = {
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
-      };
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
 
-      try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
+      const result = await auth.login(email, password);
 
-        const data = await response.json();
+      if (result.success) {
+        // Success
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('bg-green-100', 'text-green-800');
+        messageDiv.classList.remove('bg-red-100', 'text-red-800');
+        messageDiv.textContent = '✅ Login successful! Redirecting...';
 
-        if (response.ok) {
-          // Success
-          messageDiv.classList.remove('hidden');
-          messageDiv.classList.add('bg-green-100', 'text-green-800');
-          messageDiv.classList.remove('bg-red-100', 'text-red-800');
-          messageDiv.textContent = 'Login successful! Redirecting...';
-
-          // Store session token
-          if (data.session && data.session.access_token) {
-            localStorage.setItem('access_token', data.session.access_token);
-          }
-
-          // Redirect to dashboard after 1 second
-          setTimeout(() => {
-            window.location.href = '/dashboard.html';
-          }, 1000);
-        } else {
-          // Error
-          messageDiv.classList.remove('hidden');
-          messageDiv.classList.add('bg-red-100', 'text-red-800');
-          messageDiv.classList.remove('bg-green-100', 'text-green-800');
-          messageDiv.textContent = data.error || 'Login failed. Please check your credentials.';
-
-          submitButton.disabled = false;
-          submitButton.textContent = 'Sign In';
-        }
-      } catch (error) {
+        // Redirect to intended page or dashboard
+        setTimeout(() => {
+          window.location.href = auth.getRedirectUrl();
+        }, 1000);
+      } else {
+        // Error
         messageDiv.classList.remove('hidden');
         messageDiv.classList.add('bg-red-100', 'text-red-800');
         messageDiv.classList.remove('bg-green-100', 'text-green-800');
-        messageDiv.textContent = 'Network error. Please check your connection.';
+        messageDiv.textContent = '❌ ' + (result.error || 'Login failed. Please check your credentials.');
 
         submitButton.disabled = false;
         submitButton.textContent = 'Sign In';
