@@ -66,6 +66,10 @@ pnpm dev
 
 The API will be available at `http://localhost:3000` (or your configured PORT).
 
+The dev server uses **nodemon** for automatic restarts when you save files. Type `rs` to manually restart.
+
+**For more development details, see [DEVELOPMENT.md](DEVELOPMENT.md)**
+
 ## Project Structure
 
 ```
