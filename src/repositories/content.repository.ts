@@ -12,7 +12,7 @@ import type {
   CreatePageContentInput,
   UpdatePageContentInput
 } from '../types/index.js'
-import { DatabaseError } from '@utils'
+import { DatabaseError } from '../utils/index.js'
 
 /**
  * Common Content Repository

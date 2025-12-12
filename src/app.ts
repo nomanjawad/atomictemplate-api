@@ -6,11 +6,11 @@ import morgan from 'morgan'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import apiRouter from '@routes/index.js'
-import { checkAllConnections } from '@db'
-import { errorHandler } from '@middleware'
-import { logger, stream } from '@utils'
-import { config, isDevelopment } from '@config'
+import apiRouter from './routes/index.js'
+import { checkAllConnections } from './db/index.js'
+import { errorHandler } from './middleware/index.js'
+import { logger, stream } from './utils/index.js'
+import { config, isDevelopment } from './config/index.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)

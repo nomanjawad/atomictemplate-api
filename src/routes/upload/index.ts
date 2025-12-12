@@ -3,8 +3,8 @@
  * Handles file upload routes for Supabase Storage
  */
 import { Router } from 'express'
-import * as uploadController from '@controllers'
-import { requireAuth } from '@middleware'
+import * as uploadController from '../../controllers/index.js'
+import { requireAuth } from '../../middleware/index.js'
 
 const router = Router()
 

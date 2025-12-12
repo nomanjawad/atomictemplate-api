@@ -4,10 +4,14 @@ import blogRouter from './blog/index.js'
 import adminRouter from './admin/index.js'
 import contentRouter from './content/index.js'
 import uploadRouter from './upload/index.js'
+import userRouter from './user/index.js'
 
 const router = Router()
 
-// Authentication routes
+// User routes (unified auth + user management)
+router.use('/user', userRouter)
+
+// Legacy authentication routes (kept for backwards compatibility)
 router.use('/auth', authRouter)
 
 // Content management routes

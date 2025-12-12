@@ -3,14 +3,14 @@
  * Handles routes for blog posts CRUD with validation
  */
 import { Router } from 'express'
-import * as blogController from '@controllers/blog.controller.js'
-import { requireAuth, optionalAuth, validate } from '@middleware'
+import * as blogController from '../../controllers/blog.controller.js'
+import { requireAuth, optionalAuth, validate } from '../../middleware/index.js'
 import {
   CreateBlogPostValidator,
   UpdateBlogPostValidator,
   GetBlogPostValidator,
   ListBlogPostsValidator
-} from '@validators'
+} from '../../validators/index.js'
 
 const router = Router()
 

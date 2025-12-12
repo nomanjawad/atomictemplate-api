@@ -4,8 +4,8 @@
  */
 
 import type { Request, Response, NextFunction } from 'express'
-import { BlogRepository } from '@repositories'
-import { NotFoundError, ValidationError } from '@utils/errors.js'
+import { BlogRepository } from '../repositories/index.js'
+import { NotFoundError, ValidationError } from '../utils/errors.js'
 import { BlogPostSchema } from '@atomictemplate/validations'
 
 const blogRepo = new BlogRepository()

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { supabase } from '@db'
-import { logger } from '@utils'
+import { supabase } from '../db/supabaseClient.js'
+import { logger } from '../utils/index.js'
 
 /**
  * Register a new user using Supabase Auth

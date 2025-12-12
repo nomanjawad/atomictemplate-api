@@ -4,8 +4,8 @@
  */
 
 import { Request, Response, NextFunction } from 'express'
-import { CommonContentRepository, PageContentRepository } from '@repositories'
-import { NotFoundError, ValidationError } from '@utils/errors.js'
+import { CommonContentRepository, PageContentRepository } from '../repositories/index.js'
+import { NotFoundError, ValidationError } from '../utils/errors.js'
 
 const commonRepo = new CommonContentRepository()
 const pageRepo = new PageContentRepository()

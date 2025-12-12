@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { register, login, logout, getProfile, verifyToken } from '@controllers'
-import { requireAuth } from '@middleware'
+import { register, login, logout, getProfile, verifyToken } from '../../controllers/index.js'
+import { requireAuth } from '../../middleware/index.js'
 
 const router = Router()
 

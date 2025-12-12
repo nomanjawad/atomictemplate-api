@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
-import { supabaseClient } from '@db'
-import { logger } from '@utils'
+import { supabaseClient } from '../db/supabaseClient.js'
+import { logger } from '../utils/index.js'
 
 /**
  * JWT Authentication Middleware using Supabase

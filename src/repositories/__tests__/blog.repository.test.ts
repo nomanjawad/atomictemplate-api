@@ -5,7 +5,7 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals'
 import { BlogRepository } from '../blog.repository.js'
 import { createMockBlogPost } from '../../__tests__/helpers.js'
-import { DatabaseError, NotFoundError } from '@utils'
+import { DatabaseError, NotFoundError } from '../../utils/index.js'
 
 // Mock the Supabase client
 jest.mock('../../db/supabaseClient', () => ({

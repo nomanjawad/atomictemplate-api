@@ -3,15 +3,15 @@
  * Handles routes for common components and page content with validation
  */
 import { Router } from 'express'
-import * as contentController from '@controllers/content.controller.js'
-import { requireAuth, optionalAuth, validate } from '@middleware'
+import * as contentController from '../../controllers/content.controller.js'
+import { requireAuth, optionalAuth, validate } from '../../middleware/index.js'
 import {
   UpsertCommonContentValidator,
   GetCommonContentValidator,
   UpsertPageContentValidator,
   GetPageContentValidator,
   ListPagesValidator
-} from '@validators'
+} from '../../validators/index.js'
 
 const router = Router()
 

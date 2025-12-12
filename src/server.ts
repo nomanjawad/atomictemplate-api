@@ -1,7 +1,7 @@
 import app from './app.js'
-import { checkAllConnections } from '@db'
-import { config, logConfigSummary, isDevelopment } from '@config'
-import { logger } from '@utils'
+import { checkAllConnections } from './db/index.js'
+import { config, logConfigSummary, isDevelopment } from './config/index.js'
+import { logger } from './utils/index.js'
 
 const PORT = config.PORT
 

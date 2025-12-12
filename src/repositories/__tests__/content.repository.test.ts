@@ -5,7 +5,7 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals'
 import { CommonContentRepository, PageContentRepository } from '../content.repository.js'
 import { createMockCommonContent, createMockPageContent } from '../../__tests__/helpers.js'
-import { DatabaseError } from '@utils'
+import { DatabaseError } from '../../utils/index.js'
 
 // Mock the Supabase client
 jest.mock('../../db/supabaseClient', () => ({

@@ -1,6 +1,6 @@
-import { supabase } from '@db'
+import { supabase } from '../db/supabaseClient.js'
 import type { Session } from '@supabase/supabase-js'
-import { logger } from '@utils'
+import { logger } from '../utils/index.js'
 
 /**
  * Session Controller

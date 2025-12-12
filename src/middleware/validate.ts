@@ -6,7 +6,7 @@
 
 import { ZodSchema, ZodError } from 'zod'
 import type { Request, Response, NextFunction } from 'express'
-import { UnprocessableEntityError } from '@utils'
+import { UnprocessableEntityError } from '../utils/index.js'
 
 /**
  * Request validation middleware factory

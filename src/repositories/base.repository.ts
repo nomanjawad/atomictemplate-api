@@ -3,8 +3,8 @@
  * @description Base repository class with common database operations
  */
 
-import { supabaseClient } from '@db'
-import { DatabaseError, ServiceUnavailableError } from '@utils'
+import { supabaseClient } from '../db/supabaseClient.js'
+import { DatabaseError, ServiceUnavailableError } from '../utils/index.js'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 /**

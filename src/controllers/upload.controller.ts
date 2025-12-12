@@ -3,8 +3,8 @@
  * Handles file uploads to Supabase Storage
  */
 import { Request, Response } from 'express'
-import { supabase } from '@db'
-import { logger } from '@utils'
+import { supabase } from '../db/supabaseClient.js'
+import { logger } from '../utils/index.js'
 import multer from 'multer'
 import path from 'path'
 

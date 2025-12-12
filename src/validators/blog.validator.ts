@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod'
-import { BlogPostSchema } from '@atomictemplate/validations/blogs'
+import { BlogPostSchema } from '@atomictemplate/validations'
 
 /**
  * Create Blog Post Request Validator
