@@ -24,11 +24,13 @@ packages/**/dist
 # production
 /build
 /dist
+dist/
 
 # misc
 .DS_Store
 *.pem
 .husky/_/
+*.bak
 
 # npm
 .npmignore
