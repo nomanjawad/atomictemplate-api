@@ -5,6 +5,7 @@ import adminRouter from './admin/index.js'
 import contentRouter from './content/index.js'
 import uploadRouter from './upload/index.js'
 import userRouter from './user/index.js'
+import pagesRouter from './pages/index.js'
 
 const router = Router()
 
@@ -16,6 +17,7 @@ router.use('/auth', authRouter)
 
 // Content management routes
 router.use('/content', contentRouter)
+router.use('/pages', pagesRouter)
 router.use('/blog', blogRouter)
 
 // Upload routes

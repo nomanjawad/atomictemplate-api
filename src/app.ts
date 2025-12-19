@@ -32,6 +32,12 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
       },
     },
+    // Disable HSTS in development to prevent HTTPS redirect issues
+    hsts: isDevelopment ? false : {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true
+    }
   })
 )
 

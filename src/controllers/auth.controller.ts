@@ -65,13 +65,28 @@ export async function register(req: Request, res: Response) {
     // IMPORTANT: Supabase returns success for duplicate emails to prevent email enumeration
     // When email is duplicate: data.user exists BUT data.session is null
     // and user.identities will be empty OR user was not newly created
-    if (!data.session || !data.user.identities || data.user.identities.length === 0) {
-      logger.warn('Registration attempted with existing email (no session created)', {
+
+    // Check if it's a duplicate email (no identities means user already exists)
+    if (data.user.identities && data.user.identities.length === 0) {
+      logger.warn('Registration attempted with existing email (no identities)', {
         email,
         hasSession: !!data.session,
-        identitiesCount: data.user.identities?.length || 0
+        identitiesCount: 0
       })
       return res.status(409).json({ error: 'Email already registered. Please login instead.' })
+    }
+
+    // If no session but user has identities, email confirmation is required
+    if (!data.session && data.user.identities && data.user.identities.length > 0) {
+      logger.info('User registered successfully - email confirmation required', { userId: data.user.id, email })
+      return res.status(201).json({
+        message: 'Registration successful. Please check your email to confirm your account.',
+        requiresEmailConfirmation: true,
+        user: {
+          id: data.user.id,
+          email: data.user.email
+        }
+      })
     }
 
     logger.info('User registered successfully', { userId: data.user.id, email })

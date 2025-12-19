@@ -2,8 +2,26 @@ import app from './app.js'
 import { checkAllConnections } from './db/index.js'
 import { config, logConfigSummary, isDevelopment } from './config/index.js'
 import { logger } from './utils/index.js'
+import { networkInterfaces } from 'os'
 
 const PORT = config.PORT
+
+// Get local network IP address
+function getLocalIP(): string | null {
+  const nets = networkInterfaces()
+  for (const name of Object.keys(nets)) {
+    const netInterface = nets[name]
+    if (!netInterface) continue
+
+    for (const net of netInterface) {
+      // Skip internal (localhost) and non-IPv4 addresses
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address
+      }
+    }
+  }
+  return null
+}
 
 async function start() {
   try {
@@ -39,8 +57,14 @@ async function start() {
     }
 
     // Start the server
-    app.listen(PORT, () => {
+    // Bind to 0.0.0.0 to make it accessible from network (like Next.js)
+    app.listen(PORT, '0.0.0.0', () => {
+      const localIP = getLocalIP()
+
       logger.info(`✓ Server is running on http://localhost:${PORT}`)
+      if (localIP) {
+        logger.info(`✓ Network access: http://${localIP}:${PORT}`)
+      }
       logger.info(`✓ Health check available at http://localhost:${PORT}/api/health`)
       logger.info(`✓ Environment: ${config.NODE_ENV}`)
       logger.info('')
